@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Balance: $${player.balance}</p>
                 <p>Bet: $${player.bet}</p>
                 <p>Cards: <span id="player-cards-${index}"></span></p>
-                <p id="player-status-${index}"></p> <!-- Added status paragraph -->
+                <p id="player-status-${index}"></p> <!-- Status paragraph -->
                 <div class="player-controls">
                     <button class="hit" data-index="${index}">Hit</button>
                     <button class="stay" data-index="${index}">Stay</button>
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show game controls
         gameTableDiv.innerHTML += `
             <div id="game-controls">
-                <button id="end-turn">End Turn</button>
+                <!-- No End Turn button -->
             </div>
         `;
 
@@ -139,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.stay').forEach(button => {
             button.addEventListener('click', handleStay);
         });
-        document.getElementById('end-turn').addEventListener('click', checkAllPlayersStayed);
     }
 
     // Hit button functionality
@@ -191,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector(`.stay[data-index="${index}"]`).disabled = true;  // Disable Stay button
 
         // Display the status of staying on the page
-        document.getElementById(`player-status-${index}`).textContent = 'Player has stayed';
+        document.getElementById(`player-status-${index}`).textContent = `${player.name} has stayed.`;
 
         checkAllPlayersStayed();
     }
