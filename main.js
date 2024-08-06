@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameLogDiv = document.getElementById('game-log');
 
     let players = [];
-    let dealer = { name: 'Dealer', balance: 0, cards: [] };
+    let dealer = { name: 'Dealer', balance: 20000, cards: [] }; // Dealer starts with $20,000
     let gameOver = false;
 
     // Start button functionality
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= numPlayers; i++) {
                 const name = document.getElementById(`player-${i}`).value;
                 if (name) {
-                    players.push({ name, balance: 20000, bet: 0, cards: [], hasStood: false });
+                    players.push({ name, balance: 0, bet: 0, cards: [], hasStood: false });
                 }
             }
             introPage.style.display = 'none';
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playerDiv.className = 'player-bet';
             playerDiv.innerHTML = `
                 <p>${player.name} - Balance: $${player.balance}</p>
-                <input type="number" id="bet-${index}" placeholder="Enter bet amount" min="1" max="${player.balance}">
+                <input type="number" id="bet-${index}" placeholder="Enter bet amount" min="1" max="10000">
             `;
             bettingTableDiv.appendChild(playerDiv);
         });
@@ -78,13 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let validBets = true;
         players.forEach((player, index) => {
             const betAmount = parseInt(document.getElementById(`bet-${index}`).value);
-            if (isNaN(betAmount) || betAmount <= 0 || betAmount > player.balance) {
+            if (isNaN(betAmount) || betAmount <= 0) {
                 alert(`Invalid bet amount for ${player.name}.`);
                 validBets = false;
                 return;
             }
             player.bet = betAmount;
-            player.balance -= betAmount;
         });
 
         if (validBets) {
@@ -269,15 +268,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameLogDiv.textContent += `${player.name} busts with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
             } else if (dealerValue > 21 || playerValue > dealerValue) {
+                player.balance += player.bet * 2; // Player wins, gets back their bet plus winnings
                 gameLogDiv.textContent += `${player.name} wins with ${playerValue}!\n`;
                 gameLogDiv.textContent += `${player.name} wins $${player.bet}.\n`;
             } else if (playerValue < dealerValue) {
                 gameLogDiv.textContent += `${player.name} loses with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
             } else {
+                player.balance += player.bet; // Tie, player gets back their bet
                 gameLogDiv.textContent += `${player.name} ties with the dealer at ${playerValue}.\n`;
-                // No money changes for a tie
             }
+            player.bet = 0; // Reset player's bet
         });
 
         // Display restart button
