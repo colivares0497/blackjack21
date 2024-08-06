@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= numPlayers; i++) {
                 const name = document.getElementById(`player-${i}`).value;
                 if (name) {
-                    players.push({ name, balance: 0, bet: 0, cards: [], hasStood: false });
+                    players.push({ name, balance: 1000, bet: 0, cards: [], hasStood: false });
                 }
             }
             introPage.style.display = 'none';
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let validBets = true;
         players.forEach((player, index) => {
             const betAmount = parseInt(document.getElementById(`bet-${index}`).value);
-            if (isNaN(betAmount) || betAmount <= 0) {
+            if (isNaN(betAmount) || betAmount <= 0 || betAmount > player.balance) {
                 alert(`Invalid bet amount for ${player.name}.`);
                 validBets = false;
                 return;
@@ -161,16 +161,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (calculateHandValue(player.cards) > 21) {
             alert(`${player.name} has busted!`);
             dealer.balance += player.bet;  // Player's bet goes to dealer
-            player.balance = 0;  // Player loses all their money
+            player.balance -= player.bet;  // Player loses their bet
             player.bet = 0;  // Reset player's bet
             player.hasStood = true;  // Player cannot hit after busting
 
             // Display result for player
             document.getElementById(`player-result-${index}`).textContent = `${player.name} busts!`;
+            document.getElementById(`player-status-${index}`).textContent = 'Busted!';
 
-            // Remove player from game
-            document.getElementById(`player-info-${index}`).remove();
-            players.splice(index, 1);  // Remove player from array
+            // Disable player controls
+            document.querySelector(`.hit[data-index="${index}"]`).disabled = true;
+            document.querySelector(`.stay[data-index="${index}"]`).disabled = true;
 
             // Re-enable buttons for remaining players
             updatePlayerControls();
@@ -296,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameLogDiv.textContent += `${player.name} busts with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
                 dealer.balance += player.bet;  // Player's bet goes to dealer
-                player.balance = 0;  // Player loses all their money
+                player.balance -= player.bet;  // Player loses their bet
                 player.bet = 0;  // Reset player's bet
                 resultParagraph.textContent = `${player.name} busts! Dealer wins.`;
             } else if (dealerValue > 21 || playerValue > dealerValue) {
@@ -309,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameLogDiv.textContent += `${player.name} loses with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
                 dealer.balance += player.bet;  // Player's bet goes to dealer
+                player.balance -= player.bet;  // Player loses their bet
                 player.bet = 0;  // Reset player's bet
                 resultParagraph.textContent = `${player.name} loses with ${playerValue}. Dealer wins.`;
             } else {
