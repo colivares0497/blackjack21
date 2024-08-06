@@ -159,11 +159,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (calculateHandValue(player.cards) > 21) {
             alert(`${player.name} has busted!`);
+            dealer.balance += player.bet;  // Player's bet goes to dealer
             player.balance = 0;  // Player loses all their money
-            dealer.balance += player.bet;  // Dealer gains the player's bet
             player.bet = 0;  // Reset player's bet
             player.hasStood = true;  // Player cannot hit after busting
-            document.querySelector(`.hit[data-index="${index}"]`).disabled = true;  // Disable Hit button
+
+            // Remove player from game
+            document.getElementById(`player-info-${index}`).remove();
+            players.splice(index, 1);  // Remove player from array
+
+            // Re-enable buttons for remaining players
+            updatePlayerControls();
+
             checkAllPlayersStayed();
         }
     }
@@ -180,7 +187,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         player.hasStood = true;
         document.querySelector(`.hit[data-index="${index}"]`).disabled = true;  // Disable Hit button
+        document.querySelector(`.stay[data-index="${index}"]`).disabled = true;  // Disable Stay button
         checkAllPlayersStayed();
+    }
+
+    // Update player controls after removal
+    function updatePlayerControls() {
+        document.querySelectorAll('.hit').forEach(button => {
+            button.addEventListener('click', handleHit);
+        });
+        document.querySelectorAll('.stay').forEach(button => {
+            button.addEventListener('click', handleStay);
+        });
     }
 
     // Check if all players have stayed
@@ -267,23 +285,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (playerValue > 21) {
                 gameLogDiv.textContent += `${player.name} busts with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
+                dealer.balance += player.bet;  // Player's bet goes to dealer
+                player.bet = 0;  // Reset player's bet
             } else if (dealerValue > 21 || playerValue > dealerValue) {
                 player.balance += player.bet * 2; // Player wins, gets back their bet plus winnings
                 gameLogDiv.textContent += `${player.name} wins with ${playerValue}!\n`;
                 gameLogDiv.textContent += `${player.name} wins $${player.bet}.\n`;
+                player.bet = 0;  // Reset player's bet
             } else if (playerValue < dealerValue) {
                 gameLogDiv.textContent += `${player.name} loses with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
+                dealer.balance += player.bet;  // Player's bet goes to dealer
+                player.bet = 0;  // Reset player's bet
             } else {
                 player.balance += player.bet; // Tie, player gets back their bet
                 gameLogDiv.textContent += `${player.name} ties with the dealer at ${playerValue}.\n`;
+                player.bet = 0;  // Reset player's bet
             }
-            player.bet = 0; // Reset player's bet
         });
 
         // Display restart button
         gamePage.innerHTML += '<button id="restart-game">Restart Game</button>';
-        restartButton = document.getElementById('restart-game');
+        const restartButton = document.getElementById('restart-game');
         restartButton.addEventListener('click', () => location.reload());
     }
 });
