@@ -18,18 +18,7 @@ function getNewShuffledDeck() {
     }
     return deck.sort(() => Math.random() - 0.5);
 }
-const cardData = [
-    { value: 'A', suit: 'hearts', image: 'downloads/Aceblackheart.jpeg' },
-    { value: '2', suit: 'hearts', image: 'downloads/2heartsblack' },
-    { value: '3', suit: 'hearts', image: 'downloads/3heartsblack' },
-{ value: '4', suit: 'hearts', image: 'downloads/4heartsblack' },
-{ value: '5', suit: 'hearts', image: 'downloads/5heartsblack' },
-{ value: '6', suit: 'hearts', image: 'downloads/6heartsblack' },
-{ value: '7', suit: 'hearts', image: 'downloads/7heartsblack' },
-{ value: '8', suit: 'hearts', image: 'downloads/8heartsblack' },
-{ value: '9', suit: 'hearts', image: 'downloads/9heartsblack' },
-{ value: '10', suit: 'hearts', image: 'downloads/10heartsblack' },
-];
+
 
 
 // Get the hand total
