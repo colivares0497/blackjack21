@@ -117,20 +117,60 @@ function placeBet() {
         dealInitialCards();
     }
 }
-
-
-// Deal initial cards
-function dealInitialCards() {
-    deck = getNewShuffledDeck();
-    dealer.hand = [deck.pop(), deck.pop()];
-    dealer.total = getHandTotal(dealer.hand);
-    for (let player of players) {
-        player.hand = [deck.pop(), deck.pop()];
-        player.total = getHandTotal(player.hand);
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
     }
-    render();
-    checkInitialBlackjack();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    shuffleArray(cardData); // Shuffle card data
+
+    const cardContainer = document.getElementById('card-container');
+
+    function createCardElement(card) {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        cardElement.dataset.value = card.value;
+        cardElement.dataset.suit = card.suit;
+        cardElement.style.backgroundImage = `url(${card.image})`;
+
+        cardElement.addEventListener('click', () => {
+            cardElement.classList.toggle('flipped');
+        });
+
+        return cardElement;
+    }
+
+    cardData.forEach(card => {
+        const cardElement = createCardElement(card);
+        cardContainer.appendChild(cardElement);
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const cardContainer = document.getElementById('card-container');
+
+    // Function to create a card element
+    function createCardElement(card) {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        cardElement.dataset.value = card.value;
+        cardElement.dataset.suit = card.suit;
+        cardElement.style.backgroundImage = `url(${card.image})`;
+
+        return cardElement;
+    }
+
+    // Loop through card data and append to container
+    cardData.forEach(card => {
+        const cardElement = createCardElement(card);
+        cardContainer.appendChild(cardElement);
+    });
+});
+
+
+
 
 // Check for initial blackjack
 function checkInitialBlackjack() {
