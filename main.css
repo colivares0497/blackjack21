@@ -1,5 +1,3 @@
-/* main.css */
-
 /* Basic reset and body styling */
 body {
     margin: 0;
@@ -54,6 +52,29 @@ button:hover {
     background-color: #403737;
 }
 
+/* Card image styling */
+.card-image {
+    width: 60px; /* Adjust as needed */
+    height: auto;
+    margin: 2px;
+    vertical-align: middle;
+}
+
+/* Status and result styling */
+#game-table .player-info p,
+#game-table .player-info h3 {
+    margin: 0;
+}
+
+#game-table .player-controls {
+    margin-top: 10px;
+}
+
+#game-table .player-info .player-controls button {
+    margin-right: 10px;
+}
+
+/* Styling for game controls */
 #game-controls {
     margin-top: 20px;
 }
@@ -68,3 +89,18 @@ button:hover {
     color: green;
 }
 
+/* Hide elements initially */
+#betting-page, #game-page {
+    display: none;
+}
+
+/* Additional responsive styling (optional) */
+@media (max-width: 768px) {
+    .player-info, .player-bet {
+        padding: 5px;
+    }
+
+    .card-image {
+        width: 45px; /* Adjust for smaller screens */
+    }
+}

@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let players = [];
     let dealer = { name: 'Dealer', balance: 20000, cards: [] }; // Dealer starts with $20,000
+    let deckId = '';
     let gameOver = false;
 
     // Start button functionality
@@ -142,6 +143,91 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Fetch new deck of cards
+    function fetchNewDeck() {
+        return fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
+            .then(response => response.json())
+            .then(data => {
+                deckId = data.deck_id;
+            });
+    }
+
+    // Draw a card from the deck
+    function drawCard() {
+        return fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`)
+            .then(response => response.json())
+            .then(data => data.cards[0])
+            .catch(error => {
+                console.error('Error drawing card:', error);
+                return null;
+            });
+    }
+
+    // Update player card display with images
+    function updatePlayerCardDisplay(index) {
+        const player = players[index];
+        const cardImages = player.cards.map(card => `<img src="${card.image}" alt="${card.value} of ${card.suit}" class="card-image">`).join(' ');
+        document.getElementById(`player-cards-${index}`).innerHTML = cardImages;
+    }
+
+    // Update dealer card display with images
+    function updateDealerCardDisplay() {
+        const cardImages = dealer.cards.map(card => `<img src="${card.image}" alt="${card.value} of ${card.suit}" class="card-image">`).join(' ');
+        document.getElementById('dealer-cards').innerHTML = cardImages;
+    }
+
+    // Start the game
+    function startGame() {
+        gameLogDiv.textContent += 'Game started. Dealer is shuffling and dealing cards...\n';
+        fetchNewDeck().then(() => {
+            shuffleAndDeal();
+        });
+    }
+
+    // Shuffle and deal cards
+    function shuffleAndDeal() {
+        gameLogDiv.textContent += 'Dealer shuffles the deck.\n';
+        gameLogDiv.textContent += 'Dealer deals cards to each player.\n';
+        players.forEach((player, index) => {
+            drawCard().then(card1 => {
+                player.cards.push(card1);
+                return drawCard();
+            }).then(card2 => {
+                player.cards.push(card2);
+                updatePlayerCardDisplay(index);
+            });
+        });
+        drawCard().then(card1 => {
+            dealer.cards.push(card1);
+            document.getElementById('dealer-cards').innerHTML = `<img src="${card1.image}" alt="${card1.value} of ${card1.suit}" class="card-image">, [hidden]`;
+        });
+    }
+
+    // Calculate hand value
+    function calculateHandValue(cards) {
+        let value = 0;
+        let aceCount = 0;
+
+        cards.forEach(card => {
+            const cardValue = card.value;
+            if (cardValue === 'ACE') {
+                value += 11;
+                aceCount++;
+            } else if (['KING', 'QUEEN', 'JACK'].includes(cardValue)) {
+                value += 10;
+            } else {
+                value += parseInt(cardValue, 10);
+            }
+        });
+
+        while (value > 21 && aceCount > 0) {
+            value -= 10;
+            aceCount--;
+        }
+
+        return value;
+    }
+
     // Hit button functionality
     function handleHit(event) {
         if (gameOver) return;
@@ -154,30 +240,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const card = drawCard();
-        player.cards.push(card);
-        document.getElementById(`player-cards-${index}`).textContent = player.cards.join(', ');
+        drawCard().then(card => {
+            player.cards.push(card);
+            updatePlayerCardDisplay(index);
 
-        if (calculateHandValue(player.cards) > 21) {
-            alert(`${player.name} has busted!`);
-            dealer.balance += player.bet;  // Player's bet goes to dealer
-            player.balance -= player.bet;  // Player loses their bet
-            player.bet = 0;  // Reset player's bet
-            player.hasStood = true;  // Player cannot hit after busting
+            if (calculateHandValue(player.cards) > 21) {
+                alert(`${player.name} has busted!`);
+                dealer.balance += player.bet;  // Player's bet goes to dealer
+                player.balance -= player.bet;  // Player loses their bet
+                player.bet = 0;  // Reset player's bet
+                player.hasStood = true;  // Player cannot hit after busting
 
-            // Display result for player
-            document.getElementById(`player-result-${index}`).textContent = `${player.name} busts!`;
-            document.getElementById(`player-status-${index}`).textContent = 'Busted!';
+                // Display result for player
+                document.getElementById(`player-result-${index}`).textContent = `${player.name} busts!`;
+                document.getElementById(`player-status-${index}`).textContent = 'Busted!';
 
-            // Disable player controls
-            document.querySelector(`.hit[data-index="${index}"]`).disabled = true;
-            document.querySelector(`.stay[data-index="${index}"]`).disabled = true;
+                // Disable player controls
+                document.querySelector(`.hit[data-index="${index}"]`).disabled = true;
+                document.querySelector(`.stay[data-index="${index}"]`).disabled = true;
 
-            // Re-enable buttons for remaining players
-            updatePlayerControls();
+                // Re-enable buttons for remaining players
+                updatePlayerControls();
 
-            checkAllPlayersStayed();
-        }
+                checkAllPlayersStayed();
+            }
+        });
     }
 
     // Stay button functionality
@@ -217,64 +304,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function startGame() {
-        gameLogDiv.textContent += 'Game started. Dealer is shuffling and dealing cards...\n';
-        shuffleAndDeal();
-    }
-
-    function shuffleAndDeal() {
-        gameLogDiv.textContent += 'Dealer shuffles the deck.\n';
-        gameLogDiv.textContent += 'Dealer deals cards to each player.\n';
-        players.forEach((player, index) => {
-            const card1 = drawCard();
-            const card2 = drawCard();
-            player.cards.push(card1, card2);
-            document.getElementById(`player-cards-${index}`).textContent = `${card1}, ${card2}`;
-        });
-        const dealerCard1 = drawCard();
-        dealer.cards.push(dealerCard1);
-        document.getElementById('dealer-cards').textContent = `${dealerCard1}, [hidden]`;
-    }
-
-    function drawCard() {
-        const suits = ['♣', '♦', '♥', '♠'];
-        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        const suit = suits[Math.floor(Math.random() * suits.length)];
-        const value = values[Math.floor(Math.random() * values.length)];
-        return `${value}${suit}`;
-    }
-
-    function calculateHandValue(cards) {
-        let value = 0;
-        let aceCount = 0;
-
-        cards.forEach(card => {
-            const cardValue = card.slice(0, -1);
-            if (cardValue === 'A') {
-                value += 11;
-                aceCount++;
-            } else if (['K', 'Q', 'J'].includes(cardValue)) {
-                value += 10;
-            } else {
-                value += parseInt(cardValue, 10);
-            }
-        });
-
-        while (value > 21 && aceCount > 0) {
-            value -= 10;
-            aceCount--;
-        }
-
-        return value;
-    }
-
     function dealerTurn() {
         gameLogDiv.textContent += 'Dealer reveals hidden card.\n';
-        document.getElementById('dealer-cards').textContent = dealer.cards.join(', ');
+        updateDealerCardDisplay();
 
         while (calculateHandValue(dealer.cards) < 17) {
-            dealer.cards.push(drawCard());
-            document.getElementById('dealer-cards').textContent = dealer.cards.join(', ');
+            drawCard().then(card => {
+                dealer.cards.push(card);
+                updateDealerCardDisplay();
+            });
         }
 
         const dealerValue = calculateHandValue(dealer.cards);
