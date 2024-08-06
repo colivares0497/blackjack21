@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= numPlayers; i++) {
                 const name = document.getElementById(`player-${i}`).value;
                 if (name) {
-                    players.push({ name, balance: 20000, bet: 0, cards: [] });
+                    players.push({ name, balance: 20000, bet: 0, cards: [], hasStayed: false });
                 }
             }
             introPage.style.display = 'none';
@@ -150,7 +150,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle player's "Stay" action
     function handlePlayerStay(playerIndex) {
         const player = players[playerIndex];
+        player.hasStayed = true;
         gameLogDiv.textContent += `${player.name} chose to stay.\n`;
+        checkAllPlayersStayed();
+    }
+
+    // Check if all players have stayed
+    function checkAllPlayersStayed() {
+        const allStayed = players.every(player => player.hasStayed);
+        if (allStayed) {
+            gameLogDiv.textContent += 'All players have stayed. Dealer reveals cards...\n';
+            revealDealerCards();
+        }
+    }
+
+    // Reveal dealer's cards
+    function revealDealerCards() {
+        // Draw the second card for the dealer
+        dealer.cards.push(drawCard());
+        document.getElementById('dealer-cards').textContent = dealer.cards.join(', ');
+        gameLogDiv.textContent += `Dealer's cards: ${dealer.cards.join(', ')}.\n`;
     }
 
     // Restart button functionality
@@ -165,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function shuffleAndDeal() {
-        // Implement shuffling and dealing logic here
         gameLogDiv.textContent += 'Dealer shuffles the deck.\n';
         gameLogDiv.textContent += 'Dealer deals cards to each player.\n';
         players.forEach((player, index) => {
@@ -180,7 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawCard() {
-        // Implement card drawing logic here
         const suits = ['♣', '♦', '♥', '♠'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
         const suit = suits[Math.floor(Math.random() * suits.length)];
@@ -188,5 +205,3 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${value}${suit}`;
     }
 });
-
-kj
