@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Game</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div id="game-area">
+        <div id="controls">
+            <label for="num-players">Number of Players:</label>
+            <input type="number" id="num-players" min="1" max="5" value="1">
+            <button id="start-game">Start Game</button>
+        </div>
+        
+        <div id="player-names" style="display:none;">
+            <h3>Enter Player Names</h3>
+            <div id="player-name-inputs"></div>
+            <button id="submit-names">Submit Names</button>
+        </div>
+        
+        <div id="betting-controls" style="display:none;">
+            <label for="bet-amount">Place Bet:</label>
+            <input type="number" id="bet-amount" min="1">
+            <button id="place-bet">Place Bet</button>
+        </div>
+
+        <div id="player-controls" style="display:none;">
+            <button id="hit-button">Hit</button>
+            <button id="stand-button">Stand</button>
+            <button id="reset-button">Reset Game</button>
+        </div>
+
+        <div id="deck-container"></div>
+
+        <h3>Dealer's Cards</h3>
+        <div id="dealer-cards" class="card-container"></div>
+
+        <div id="players-container"></div>
+
+        <div id="status"></div>
+        <div id="balance">Balance: $20000</div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
