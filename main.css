@@ -51,3 +51,11 @@ button:hover {
 .player-bet, .player-info {
     margin: 10px 0;
 }
+
+.player-controls {
+    margin-top: 10px;
+}
+
+.player-controls button {
+    margin: 5px;
+}
