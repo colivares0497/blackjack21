@@ -201,9 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Check if all players have stayed
+    // Check if all players have stayed or busted
     function checkAllPlayersStayed() {
-        if (players.every(player => player.hasStood)) {
+        if (players.length === 0 || players.every(player => player.hasStood)) {
             dealerTurn();
         }
     }
@@ -286,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameLogDiv.textContent += `${player.name} busts with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
                 dealer.balance += player.bet;  // Player's bet goes to dealer
+                player.balance = 0;  // Player loses all their money
                 player.bet = 0;  // Reset player's bet
             } else if (dealerValue > 21 || playerValue > dealerValue) {
                 player.balance += player.bet * 2; // Player wins, gets back their bet plus winnings
