@@ -79,18 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Proceed with the game logic
         startGame();
     });
-    const cardData = [
-        { value: 'A', suit: 'hearts', image: 'downloads/Aceblackheart.jpeg' },
-        { value: '2', suit: 'hearts', image: 'downloads/2heartsblack' },
-        { value: '3', suit: 'hearts', image: 'downloads/3heartsblack' },
-    { value: '4', suit: 'hearts', image: 'downloads/4heartsblack' },
-    { value: '5', suit: 'hearts', image: 'downloads/5heartsblack' },
-    { value: '6', suit: 'hearts', image: 'downloads/6heartsblack' },
-    { value: '7', suit: 'hearts', image: 'downloads/7heartsblack' },
-    { value: '8', suit: 'hearts', image: 'downloads/8heartsblack' },
-    { value: '9', suit: 'hearts', image: 'downloads/9heartsblack' },
-    { value: '10', suit: 'hearts', image: 'downloads/10heartsblack' },
-    ];
+    
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
