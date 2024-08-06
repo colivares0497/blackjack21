@@ -160,7 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (calculateHandValue(player.cards) > 21) {
             alert(`${player.name} has busted!`);
+            player.balance = 0;  // Player loses all their money
+            dealer.balance += player.bet;  // Dealer gains the player's bet
+            player.bet = 0;  // Reset player's bet
             player.hasStood = true;  // Player cannot hit after busting
+            document.querySelector(`.hit[data-index="${index}"]`).disabled = true;  // Disable Hit button
             checkAllPlayersStayed();
         }
     }
@@ -176,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         player.hasStood = true;
-        document.querySelector(`.hit[data-index="${index}"]`).disabled = true;
+        document.querySelector(`.hit[data-index="${index}"]`).disabled = true;  // Disable Hit button
         checkAllPlayersStayed();
     }
 
