@@ -78,7 +78,77 @@ document.addEventListener('DOMContentLoaded', () => {
         // Proceed with the game logic
         startGame();
     });
-
+    const cardData = [
+        { value: 'A', suit: 'hearts', image: 'downloads/Aceblackheart.jpeg' },
+        { value: '2', suit: 'hearts', image: 'downloads/2heartsblack' },
+        { value: '3', suit: 'hearts', image: 'downloads/3heartsblack' },
+    { value: '4', suit: 'hearts', image: 'downloads/4heartsblack' },
+    { value: '5', suit: 'hearts', image: 'downloads/5heartsblack' },
+    { value: '6', suit: 'hearts', image: 'downloads/6heartsblack' },
+    { value: '7', suit: 'hearts', image: 'downloads/7heartsblack' },
+    { value: '8', suit: 'hearts', image: 'downloads/8heartsblack' },
+    { value: '9', suit: 'hearts', image: 'downloads/9heartsblack' },
+    { value: '10', suit: 'hearts', image: 'downloads/10heartsblack' },
+    ];
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+        return array;
+    }
+    function dealCards(deck) {
+        shuffleArray(deck);
+    
+        // Deal 2 cards to each player and 2 to the dealer
+        const player1Hand = [deck.pop(), deck.pop()];
+        const player2Hand = [deck.pop(), deck.pop()];
+        const dealerHand = [deck.pop(), deck.pop()];
+    
+        return {
+            player1Hand,
+            player2Hand,
+            dealerHand
+        };
+    } 
+    function createCardElement(card, faceDown = false) {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        if (faceDown) {
+            cardElement.classList.add('face-down');
+            cardElement.style.backgroundImage = 'url(images/face-down.jpg)'; // Path to face-down card image
+        } else {
+            cardElement.style.backgroundImage = `url(${card.image})`;
+        }
+        return cardElement;
+    }
+    
+    function renderHand(hand, containerId, faceDownIndices = []) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // Clear existing cards
+    
+        hand.forEach((card, index) => {
+            const faceDown = faceDownIndices.includes(index);
+            const cardElement = createCardElement(card, faceDown);
+            container.appendChild(cardElement);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const deck = [
+            { value: 'A', suit: 'hearts', image: 'images/ace-of-hearts.jpg' },
+            { value: '2', suit: 'hearts', image: 'images/2-of-hearts.jpg' },
+            { value: '3', suit: 'hearts', image: 'images/3-of-hearts.jpg' },
+            // Add more cards
+        ];
+    
+        const { player1Hand, player2Hand, dealerHand } = dealCards(deck);
+    
+        // Render hands
+        renderHand(player1Hand, 'player1-hand');
+        renderHand(player2Hand, 'player2-hand');
+        renderHand(dealerHand, 'dealer-hand', [1]); // Only the second card of the dealer's hand is face down
+    });
+           
     // Hit button functionality
     hitButton.addEventListener('click', () => {
         // Implement hit functionality

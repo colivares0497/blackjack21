@@ -38,6 +38,20 @@ body {
     align-items: center;
     margin-top: 20px;
 }
+.card {
+    width: 100px;
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.face-down {
+    background-image: url(images/face-down.jpg); /* Path to your face-down card image */
+}
 
 .player {
     margin: 10px;
