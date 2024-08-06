@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Balance: $${player.balance}</p>
                 <p>Bet: $${player.bet}</p>
                 <p>Cards: <span id="player-cards-${index}"></span></p>
+                <p id="player-status-${index}"></p> <!-- Added status paragraph -->
                 <div class="player-controls">
                     <button class="hit" data-index="${index}">Hit</button>
                     <button class="stay" data-index="${index}">Stay</button>
@@ -188,6 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
         player.hasStood = true;
         document.querySelector(`.hit[data-index="${index}"]`).disabled = true;  // Disable Hit button
         document.querySelector(`.stay[data-index="${index}"]`).disabled = true;  // Disable Stay button
+
+        // Display the status of staying on the page
+        document.getElementById(`player-status-${index}`).textContent = 'Player has stayed';
+
         checkAllPlayersStayed();
     }
 
@@ -273,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gameOver = true;
             gameLogDiv.textContent += 'Dealer has 21. Dealer wins!\n';
             alert('Dealer wins with a blackjack! All bets are lost.');
+            endGame();
         } else {
             resolveWinners();
         }
@@ -305,7 +311,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Display restart button
+        endGame();
+    }
+
+    function endGame() {
         gamePage.innerHTML += '<button id="restart-game">Restart Game</button>';
         const restartButton = document.getElementById('restart-game');
         restartButton.addEventListener('click', () => location.reload());
