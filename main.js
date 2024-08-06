@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="hit" data-index="${index}">Hit</button>
                     <button class="stay" data-index="${index}">Stay</button>
                 </div>
+                <p id="player-result-${index}"></p> <!-- Result paragraph -->
             `;
             gameTableDiv.appendChild(playerDiv);
         });
@@ -163,6 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
             player.balance = 0;  // Player loses all their money
             player.bet = 0;  // Reset player's bet
             player.hasStood = true;  // Player cannot hit after busting
+
+            // Display result for player
+            document.getElementById(`player-result-${index}`).textContent = `${player.name} busts!`;
 
             // Remove player from game
             document.getElementById(`player-info-${index}`).remove();
@@ -287,26 +291,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const dealerValue = calculateHandValue(dealer.cards);
         players.forEach(player => {
             const playerValue = calculateHandValue(player.cards);
+            const resultParagraph = document.getElementById(`player-result-${players.indexOf(player)}`);
             if (playerValue > 21) {
                 gameLogDiv.textContent += `${player.name} busts with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
                 dealer.balance += player.bet;  // Player's bet goes to dealer
                 player.balance = 0;  // Player loses all their money
                 player.bet = 0;  // Reset player's bet
+                resultParagraph.textContent = `${player.name} busts! Dealer wins.`;
             } else if (dealerValue > 21 || playerValue > dealerValue) {
                 player.balance += player.bet * 2; // Player wins, gets back their bet plus winnings
                 gameLogDiv.textContent += `${player.name} wins with ${playerValue}!\n`;
                 gameLogDiv.textContent += `${player.name} wins $${player.bet}.\n`;
                 player.bet = 0;  // Reset player's bet
+                resultParagraph.textContent = `${player.name} wins with ${playerValue}!`;
             } else if (playerValue < dealerValue) {
                 gameLogDiv.textContent += `${player.name} loses with ${playerValue}. Dealer wins.\n`;
                 gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
                 dealer.balance += player.bet;  // Player's bet goes to dealer
                 player.bet = 0;  // Reset player's bet
+                resultParagraph.textContent = `${player.name} loses with ${playerValue}. Dealer wins.`;
             } else {
                 player.balance += player.bet; // Tie, player gets back their bet
                 gameLogDiv.textContent += `${player.name} ties with the dealer at ${playerValue}.\n`;
                 player.bet = 0;  // Reset player's bet
+                resultParagraph.textContent = `${player.name} ties with the dealer at ${playerValue}.`;
             }
         });
 
