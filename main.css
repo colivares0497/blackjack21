@@ -1,94 +1,48 @@
+/* Basic styles for the entire game */
 body {
     font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #2e8b57;
-    color: white;
-    margin: 0;
-    overflow: hidden; /* Prevents overflow */
-}
-
-h1, h2 {
     text-align: center;
 }
 
 #landing-page, #intro-page, #betting-page, #game-page {
-    text-align: center;
-    width: 100%;
-    max-width: 1200px; /* Ensures the content doesn't stretch too much */
-    margin: 0 auto;
-}
-
-input[type="number"], input[type="text"] {
-    margin: 10px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 100%; /* Full width */
-    max-width: 200px; /* Restricts the input width */
-}
-
-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 10px;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-#player-info-display, #game-controls, #betting-table, #game-table {
     margin: 20px;
 }
 
-#game-log {
-    margin: 20px;
-    font-size: 18px;
-}
-
-.player-bet, .player-info {
-    margin: 10px 0;
-}
-
-#game-table {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
+/* Style for player information */
 .player-info {
-    border: 1px solid #fff;
-    border-radius: 5px;
+    margin-bottom: 20px;
     padding: 10px;
-    margin: 5px;
-    background-color: #333;
-    width: 200px; /* Fixed width */
+    border: 1px solid #000;
+    border-radius: 5px;
 }
 
 #dealer-info {
-    border: 1px solid #fff;
-    border-radius: 5px;
+    border: 2px solid #000;
+    margin-bottom: 20px;
     padding: 10px;
-    margin: 5px;
-    background-color: #444;
-    width: 200px; /* Fixed width */
+    border-radius: 5px;
+    background-color: #f8f8f8;
 }
 
+.player-bet {
+    margin-bottom: 15px;
+}
+
+/* Style for game controls */
 #game-controls {
-    display: flex;
-    justify-content: center;
     margin: 20px;
 }
 
-button#hit, button#stay, button#restart-game {
-    margin: 5px;
+/* Style for game log */
+#game-log {
+    border-top: 1px solid #000;
+    padding-top: 10px;
+    margin-top: 10px;
+    font-size: 1.2em;
+    white-space: pre-wrap;
+}
+
+/* Highlight the current player */
+.player-info.active {
+    border: 2px solid red;
 }

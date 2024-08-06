@@ -7,46 +7,30 @@
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    <!-- Landing Page -->
     <div id="landing-page">
-        <h1>Welcome to Blackjack</h1>
         <button id="start-button">Start Game</button>
     </div>
 
-    <!-- Intro Page -->
-    <div id="intro-page" style="display: none;">
-        <h2>Enter Number of Players</h2>
+    <div id="intro-page" style="display:none;">
+        <h1>Welcome to Blackjack</h1>
+        <label for="num-players">Number of Players (1-8):</label>
         <input type="number" id="num-players" min="1" max="8">
         <button id="submit-players">Submit</button>
         <div id="player-names"></div>
     </div>
 
-    <!-- Betting Page -->
-    <div id="betting-page" style="display: none;">
+    <div id="betting-page" style="display:none;">
         <h2>Place Your Bets</h2>
         <div id="betting-table"></div>
         <button id="submit-bets">Submit Bets</button>
     </div>
 
-    <!-- Game Page -->
-    <div id="game-page" style="display: none;">
-        <div id="game-table">
-            <!-- Dealer Info -->
-            <div id="dealer-info" class="player-info">
-                <h3>Dealer</h3>
-                <p>Balance: $0</p>
-                <p>Cards: <span id="dealer-cards"></span></p>
-            </div>
-
-            <!-- Players Info -->
-            <!-- Player elements will be dynamically inserted here -->
-        </div>
-
+    <div id="game-page" style="display:none;">
+        <div id="game-table"></div>
         <div id="game-controls">
-            <button id="hit" style="display: none;">Hit</button>
-            <button id="stay" style="display: none;">Stay</button>
+            <button id="hit">Hit</button>
+            <button id="stay">Stay</button>
         </div>
-
         <div id="game-log"></div>
     </div>
 
