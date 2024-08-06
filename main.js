@@ -18,6 +18,31 @@ function getNewShuffledDeck() {
     }
     return deck.sort(() => Math.random() - 0.5);
 }
+const cardData = [
+    { value: 'A', suit: 'hearts', image: 'downloads/Aceblackheart.jpeg' },
+    { value: '2', suit: 'hearts', image: 'downloads/2heartsblack' },
+    { value: '3', suit: 'hearts', image: 'downloads/3heartsblack' },
+{ value: '4', suit: 'hearts', image: 'downloads/4heartsblack' },
+{ value: '5', suit: 'hearts', image: 'downloads/5heartsblack' },
+{ value: '6', suit: 'hearts', image: 'downloads/6heartsblack' },
+{ value: '7', suit: 'hearts', image: 'downloads/7heartsblack' },
+{ value: '8', suit: 'hearts', image: 'downloads/8heartsblack' },
+{ value: '9', suit: 'hearts', image: 'downloads/9heartsblack' },
+{ value: '10', suit: 'hearts', image: 'downloads/10heartsblack' },
+];
+Javascript
+
+function flipCard() {
+    if (lockBoard) return;
+    if (this === firstCard) return;
+
+    this.classList.add('flipped');
+    this.style.backgroundImage = `url('downloads/${this.getAttribute('data-value')}-Backcardblue.jpeg')`;
+
+    if (!firstCard) {
+        firstCard = this;
+        return;
+    }
 
 // Get the hand total
 function getHandTotal(hand) {
@@ -104,6 +129,7 @@ function placeBet() {
         dealInitialCards();
     }
 }
+
 
 // Deal initial cards
 function dealInitialCards() {
