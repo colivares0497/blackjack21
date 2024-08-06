@@ -10,11 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBetsButton = document.getElementById('submit-bets');
     const gameTableDiv = document.getElementById('game-table');
     const gameLogDiv = document.getElementById('game-log');
-    let restartButton;
 
     let players = [];
     let dealer = { name: 'Dealer', balance: 0, cards: [] };
-    let currentPlayerIndex = 0;  // Index of the player whose turn it is
     let gameOver = false;
 
     // Start button functionality
@@ -119,43 +117,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Balance: $${player.balance}</p>
                 <p>Bet: $${player.bet}</p>
                 <p>Cards: <span id="player-cards-${index}"></span></p>
-                <div id="player-controls-${index}" class="player-controls">
-                    <!-- Buttons will be added dynamically -->
+                <div class="player-controls">
+                    <button class="hit" data-index="${index}">Hit</button>
+                    <button class="stay" data-index="${index}">Stay</button>
                 </div>
             `;
             gameTableDiv.appendChild(playerDiv);
         });
 
-        // Show game controls (if needed)
+        // Show game controls
         gameTableDiv.innerHTML += `
             <div id="game-controls">
-                <button id="restart-game">Restart Game</button>
+                <button id="end-turn">End Turn</button>
             </div>
         `;
 
-        // Add event listeners for the restart button
-        restartButton = document.getElementById('restart-game');
-        restartButton.addEventListener('click', () => location.reload());
-
-        // Initialize player controls
-        initializePlayerControls();
-    }
-
-    // Initialize player controls
-    function initializePlayerControls() {
-        players.forEach((player, index) => {
-            const controlsDiv = document.getElementById(`player-controls-${index}`);
-            if (controlsDiv) {
-                controlsDiv.innerHTML = `
-                    <button class="hit" data-index="${index}">Hit</button>
-                    <button class="stay" data-index="${index}">Stay</button>
-                `;
-
-                // Add event listeners for player buttons
-                controlsDiv.querySelector('.hit').addEventListener('click', handleHit);
-                controlsDiv.querySelector('.stay').addEventListener('click', handleStay);
-            }
+        // Add event listeners for buttons
+        document.querySelectorAll('.hit').forEach(button => {
+            button.addEventListener('click', handleHit);
         });
+        document.querySelectorAll('.stay').forEach(button => {
+            button.addEventListener('click', handleStay);
+        });
+        document.getElementById('end-turn').addEventListener('click', checkAllPlayersStayed);
     }
 
     // Hit button functionality
@@ -176,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (calculateHandValue(player.cards) > 21) {
             alert(`${player.name} has busted!`);
-            player.hasStood = true; // Player cannot hit after busting
+            player.hasStood = true;  // Player cannot hit after busting
             checkAllPlayersStayed();
         }
     }
@@ -192,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         player.hasStood = true;
+        document.querySelector(`.hit[data-index="${index}"]`).disabled = true;
         checkAllPlayersStayed();
     }
 
