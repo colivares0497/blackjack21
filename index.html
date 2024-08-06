@@ -22,14 +22,15 @@
         <button id="submit-players">Submit</button>
     </div>
 
+    <div id="betting-page" style="display: none;">
+        <h2>Place Your Bets</h2>
+        <div id="betting-table"></div>
+        <button id="submit-bets">Submit Bets</button>
+    </div>
+
     <div id="game-page" style="display: none;">
         <h2>Blackjack 21 Game</h2>
-        <div id="player-info-display">
-            <p>Balance: $<span id="player-balance">20000</span></p>
-            <p>Bet: $<span id="player-bet">0</span></p>
-            <input type="number" id="bet-amount" placeholder="Enter bet amount" min="1" max="20000">
-            <button id="place-bet">Place Bet</button>
-        </div>
+        <div id="game-table"></div>
         <div id="game-controls">
             <button id="hit">Hit</button>
             <button id="stay">Stay</button>
@@ -41,6 +42,3 @@
     <script src="main.js"></script>
 </body>
 </html>
-<div id="player1-hand" class="hand"></div>
-<div id="player2-hand" class="hand"></div>
-<div id="dealer-hand" class="hand"></div>

@@ -2,23 +2,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('start-button');
     const introPage = document.getElementById('intro-page');
     const submitPlayersButton = document.getElementById('submit-players');
+    const bettingPage = document.getElementById('betting-page');
     const gamePage = document.getElementById('game-page');
     const numPlayersInput = document.getElementById('num-players');
     const playerNamesDiv = document.getElementById('player-names');
-    const placeBetButton = document.getElementById('place-bet');
-    const betAmountInput = document.getElementById('bet-amount');
-    const playerBalanceSpan = document.getElementById('player-balance');
-    const playerBetSpan = document.getElementById('player-bet');
-    const { player1Hand, player2Hand, dealerHand } = dealCards(deck);
+    const bettingTableDiv = document.getElementById('betting-table');
+    const submitBetsButton = document.getElementById('submit-bets');
+    const gameTableDiv = document.getElementById('game-table');
     const hitButton = document.getElementById('hit');
     const stayButton = document.getElementById('stay');
     const restartButton = document.getElementById('restart-game');
     const gameLogDiv = document.getElementById('game-log');
 
     let players = [];
-    let currentPlayerIndex = 0;
-    let playerBalance = 20000;
-    let playerBet = 0;
+    let dealer = { name: 'Dealer', balance: 0, cards: [] };
 
     // Start button functionality
     startButton.addEventListener('click', () => {
@@ -53,92 +50,79 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= numPlayers; i++) {
                 const name = document.getElementById(`player-${i}`).value;
                 if (name) {
-                    players.push({ name, balance: 20000, bet: 0 });
+                    players.push({ name, balance: 20000, bet: 0, cards: [] });
                 }
             }
             introPage.style.display = 'none';
-            gamePage.style.display = 'block';
-            updatePlayerInfo();
+            bettingPage.style.display = 'block';
+            showBettingTable();
         });
 
         playerNamesDiv.appendChild(submitNamesButton);
     });
 
-    // Place bet functionality
-    placeBetButton.addEventListener('click', () => {
-        const betAmount = parseInt(betAmountInput.value);
-        if (isNaN(betAmount) || betAmount <= 0 || betAmount > playerBalance) {
-            alert('Invalid bet amount.');
-            return;
-        }
-        playerBet = betAmount;
-        playerBalance -= betAmount;
-        playerBetSpan.textContent = playerBet;
-        playerBalanceSpan.textContent = playerBalance;
-
-        // Proceed with the game logic
-        startGame();
-    });
-    
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-        }
-        return array;
-    }
-    function dealCards(deck) {
-        shuffleArray(deck);
-    
-        // Deal 2 cards to each player and 2 to the dealer
-        const player1Hand = [deck.pop(), deck.pop()];
-        const player2Hand = [deck.pop(), deck.pop()];
-        const dealerHand = [deck.pop(), deck.pop()];
-    
-        return {
-            player1Hand,
-            player2Hand,
-            dealerHand
-        };
-    } 
-    function createCardElement(card, faceDown = false) {
-        const cardElement = document.createElement('div');
-        cardElement.classList.add('card');
-        if (faceDown) {
-            cardElement.classList.add('face-down');
-            cardElement.style.backgroundImage = 'url(images/face-down.jpg)'; // Path to face-down card image
-        } else {
-            cardElement.style.backgroundImage = `url(${card.image})`;
-        }
-        return cardElement;
-    }
-    
-    function renderHand(hand, containerId, faceDownIndices = []) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = ''; // Clear existing cards
-    
-        hand.forEach((card, index) => {
-            const faceDown = faceDownIndices.includes(index);
-            const cardElement = createCardElement(card, faceDown);
-            container.appendChild(cardElement);
+    // Show betting table functionality
+    function showBettingTable() {
+        bettingTableDiv.innerHTML = '';
+        players.forEach((player, index) => {
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'player-bet';
+            playerDiv.innerHTML = `
+                <p>${player.name} - Balance: $${player.balance}</p>
+                <input type="number" id="bet-${index}" placeholder="Enter bet amount" min="1" max="${player.balance}">
+            `;
+            bettingTableDiv.appendChild(playerDiv);
         });
     }
-    document.addEventListener('DOMContentLoaded', () => {
-        const deck = [
-            { value: 'A', suit: 'hearts', image: 'images/ace-of-hearts.jpg' },
-            { value: '2', suit: 'hearts', image: 'images/2-of-hearts.jpg' },
-            { value: '3', suit: 'hearts', image: 'images/3-of-hearts.jpg' },
-            // Add more cards
-        ];
-    
-        const { player1Hand, player2Hand, dealerHand } = dealCards(deck);
-    
-        // Render hands
-        renderHand(player1Hand, 'player1-hand');
-        renderHand(player2Hand, 'player2-hand');
-        renderHand(dealerHand, 'dealer-hand', [1]); // Only the second card of the dealer's hand is face down
+
+    // Submit bets functionality
+    submitBetsButton.addEventListener('click', () => {
+        let validBets = true;
+        players.forEach((player, index) => {
+            const betAmount = parseInt(document.getElementById(`bet-${index}`).value);
+            if (isNaN(betAmount) || betAmount <= 0 || betAmount > player.balance) {
+                alert(`Invalid bet amount for ${player.name}.`);
+                validBets = false;
+                return;
+            }
+            player.bet = betAmount;
+            player.balance -= betAmount;
+        });
+
+        if (validBets) {
+            bettingPage.style.display = 'none';
+            gamePage.style.display = 'block';
+            showGameTable();
+            startGame();
+        }
     });
-           
+
+    // Show game table functionality
+    function showGameTable() {
+        gameTableDiv.innerHTML = '';
+        const dealerDiv = document.createElement('div');
+        dealerDiv.className = 'player-info';
+        dealerDiv.innerHTML = `
+            <h3>${dealer.name}</h3>
+            <p>Balance: $${dealer.balance}</p>
+            <p>Cards: <span id="dealer-cards"></span></p>
+        `;
+        gameTableDiv.appendChild(dealerDiv);
+
+        players.forEach((player, index) => {
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'player-info';
+            playerDiv.id = `player-info-${index}`;
+            playerDiv.innerHTML = `
+                <h3>${player.name}</h3>
+                <p>Balance: $${player.balance}</p>
+                <p>Bet: $${player.bet}</p>
+                <p>Cards: <span id="player-cards-${index}"></span></p>
+            `;
+            gameTableDiv.appendChild(playerDiv);
+        });
+    }
+
     // Hit button functionality
     hitButton.addEventListener('click', () => {
         // Implement hit functionality
@@ -156,13 +140,35 @@ document.addEventListener('DOMContentLoaded', () => {
         location.reload();
     });
 
-    function updatePlayerInfo() {
-        playerBalanceSpan.textContent = playerBalance;
-        playerBetSpan.textContent = playerBet;
+    function startGame() {
+        gameLogDiv.textContent += 'Game started. Dealer is shuffling and dealing cards...\n';
+        // Shuffle and deal cards
+        shuffleAndDeal();
     }
 
-    function startGame() {
-        // Implement the logic to start the game
-        gameLogDiv.textContent += 'Game started.\n';
+    function shuffleAndDeal() {
+        // Implement shuffling and dealing logic here
+        // For now, we will just simulate with a placeholder
+        gameLogDiv.textContent += 'Dealer shuffles the deck.\n';
+        gameLogDiv.textContent += 'Dealer deals cards to each player.\n';
+        players.forEach((player, index) => {
+            const card1 = drawCard();
+            const card2 = drawCard();
+            player.cards.push(card1, card2);
+            document.getElementById(`player-cards-${index}`).textContent = `${card1}, ${card2}`;
+        });
+        const dealerCard1 = drawCard();
+        dealer.cards.push(dealerCard1);
+        document.getElementById('dealer-cards').textContent = `${dealerCard1}, [hidden]`;
+    }
+
+    function drawCard() {
+        // Implement card drawing logic here
+        // For now, we will just return a placeholder
+        const suits = ['♣', '♦', '♥', '♠'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        const suit = suits[Math.floor(Math.random() * suits.length)];
+        const value = values[Math.floor(Math.random() * values.length)];
+        return `${value}${suit}`;
     }
 });

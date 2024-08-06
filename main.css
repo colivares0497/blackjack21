@@ -1,71 +1,53 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #2b2b2b;
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
-
-#landingPage {
-    margin-top: 50px;
-}
-
-#startBtn, #placeBetBtn, #hitBtn, #stayBtn, #restartBtn {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin: 10px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    border-radius: 5px;
-}
-
-#playersForm {
-    margin-top: 20px;
-}
-
-#playerInputs input {
-    display: block;
-    margin: 10px auto;
-    padding: 10px;
-    font-size: 16px;
-}
-
-#gameContainer {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    margin-top: 20px;
-}
-.card {
-    width: 100px;
-    height: 150px;
-    background-size: cover;
-    background-position: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 5px;
+    height: 100vh;
+    background-color: #2e8b57;
+    color: white;
+    margin: 0;
 }
 
-.face-down {
-    background-image: url(images/face-down.jpg); /* Path to your face-down card image */
+h1, h2 {
+    text-align: center;
 }
 
-.player {
+#landing-page, #intro-page, #betting-page, #game-page {
+    text-align: center;
+}
+
+input[type="number"], input[type="text"] {
     margin: 10px;
-    border: 1px solid #555;
-    padding: 20px;
+    padding: 5px;
     border-radius: 5px;
-    width: 300px;
-    background-color: #444;
+    border: 1px solid #ccc;
 }
 
-#messages {
-    margin-top: 20px;
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px;
 }
 
-h1, h2, h3 {
-    color: #4CAF50;
+button:hover {
+    background-color: #45a049;
+}
+
+#player-info-display, #game-controls, #betting-table, #game-table {
+    margin: 20px;
+}
+
+#game-log {
+    margin: 20px;
+    font-size: 18px;
+}
+
+.player-bet, .player-info {
+    margin: 10px 0;
 }
