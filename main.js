@@ -101,8 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show game table functionality
     function showGameTable() {
         gameTableDiv.innerHTML = '';
+
+        // Dealer info
         const dealerDiv = document.createElement('div');
         dealerDiv.className = 'player-info';
+        dealerDiv.id = 'dealer-info';
         dealerDiv.innerHTML = `
             <h3>${dealer.name}</h3>
             <p>Balance: $${dealer.balance}</p>
@@ -110,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         gameTableDiv.appendChild(dealerDiv);
 
+        // Player info
         players.forEach((player, index) => {
             const playerDiv = document.createElement('div');
             playerDiv.className = 'player-info';
@@ -126,6 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             gameTableDiv.appendChild(playerDiv);
         });
+
+        // Show controls
+        hitButton.style.display = 'inline-block';
+        stayButton.style.display = 'inline-block';
 
         // Add event listeners for new buttons
         document.querySelectorAll('.hit').forEach(button => {

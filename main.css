@@ -22,6 +22,8 @@ input[type="number"], input[type="text"] {
     padding: 5px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    background-color: #fff;
+    color: #000;
 }
 
 button {
@@ -39,23 +41,29 @@ button:hover {
     background-color: #45a049;
 }
 
-#player-info-display, #game-controls, #betting-table, #game-table {
-    margin: 20px;
+#player-info {
+    margin-bottom: 20px;
 }
 
-#game-log {
-    margin: 20px;
-    font-size: 18px;
+#betting-table {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.player-bet, .player-info {
-    margin: 10px 0;
+.player-bet {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 #game-table {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 20px;
 }
 
 .player-info {
@@ -64,12 +72,24 @@ button:hover {
     border: 1px solid #fff;
     border-radius: 10px;
     background-color: rgba(255, 255, 255, 0.1);
+    width: 300px;
+    text-align: left;
 }
 
 .player-controls {
     margin-top: 10px;
 }
 
-#dealer-cards {
+#game-controls {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#game-log {
+    margin: 20px;
+    font-size: 18px;
+}
+
+#dealer-info, #dealer-cards, .player-info p {
     font-weight: bold;
 }
