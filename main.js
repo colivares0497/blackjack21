@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let players = [];
     let dealer = { name: 'Dealer', balance: 0, cards: [] };
+    let gameOver = false;
 
     // Start button functionality
     startButton.addEventListener('click', () => {
@@ -50,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= numPlayers; i++) {
                 const name = document.getElementById(`player-${i}`).value;
                 if (name) {
-                    players.push({ name, balance: 20000, bet: 0, cards: [], hasStayed: false });
+                    players.push({ name, balance: 20000, bet: 0, cards: [], hasStood: false });
                 }
             }
             introPage.style.display = 'none';
@@ -119,67 +120,68 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Bet: $${player.bet}</p>
                 <p>Cards: <span id="player-cards-${index}"></span></p>
                 <div class="player-controls">
-                    <button class="player-hit" data-player-index="${index}">Hit</button>
-                    <button class="player-stay" data-player-index="${index}">Stay</button>
+                    <button class="hit" data-index="${index}">Hit</button>
+                    <button class="stay" data-index="${index}">Stay</button>
                 </div>
             `;
             gameTableDiv.appendChild(playerDiv);
         });
+
+        // Add event listeners for new buttons
+        document.querySelectorAll('.hit').forEach(button => {
+            button.addEventListener('click', (e) => handleHit(e));
+        });
+        document.querySelectorAll('.stay').forEach(button => {
+            button.addEventListener('click', (e) => handleStay(e));
+        });
     }
 
-    // Add event listeners to player-specific hit and stay buttons
-    gameTableDiv.addEventListener('click', (event) => {
-        if (event.target.classList.contains('player-hit')) {
-            const playerIndex = event.target.dataset.playerIndex;
-            handlePlayerHit(parseInt(playerIndex));
-        } else if (event.target.classList.contains('player-stay')) {
-            const playerIndex = event.target.dataset.playerIndex;
-            handlePlayerStay(parseInt(playerIndex));
+    // Hit button functionality
+    function handleHit(event) {
+        if (gameOver) return;
+
+        const index = parseInt(event.target.getAttribute('data-index'));
+        const player = players[index];
+
+        if (player.hasStood) {
+            alert(`${player.name} has already stayed.`);
+            return;
         }
-    });
 
-    // Handle player's "Hit" action
-    function handlePlayerHit(playerIndex) {
-        const player = players[playerIndex];
-        const newCard = drawCard();
-        player.cards.push(newCard);
-        document.getElementById(`player-cards-${playerIndex}`).textContent = player.cards.join(', ');
-        gameLogDiv.textContent += `${player.name} drew a ${newCard}.\n`;
+        const card = drawCard();
+        player.cards.push(card);
+        document.getElementById(`player-cards-${index}`).textContent = player.cards.join(', ');
+
+        if (calculateHandValue(player.cards) > 21) {
+            alert(`${player.name} has busted!`);
+            player.hasStood = true;  // Player cannot hit after busting
+            checkAllPlayersStayed();
+        }
     }
 
-    // Handle player's "Stay" action
-    function handlePlayerStay(playerIndex) {
-        const player = players[playerIndex];
-        player.hasStayed = true;
-        gameLogDiv.textContent += `${player.name} chose to stay.\n`;
+    // Stay button functionality
+    function handleStay(event) {
+        const index = parseInt(event.target.getAttribute('data-index'));
+        const player = players[index];
+
+        if (player.hasStood) {
+            alert(`${player.name} has already stayed.`);
+            return;
+        }
+
+        player.hasStood = true;
         checkAllPlayersStayed();
     }
 
     // Check if all players have stayed
     function checkAllPlayersStayed() {
-        const allStayed = players.every(player => player.hasStayed);
-        if (allStayed) {
-            gameLogDiv.textContent += 'All players have stayed. Dealer reveals cards...\n';
-            revealDealerCards();
+        if (players.every(player => player.hasStood)) {
+            dealerTurn();
         }
     }
 
-    // Reveal dealer's cards
-    function revealDealerCards() {
-        // Draw the second card for the dealer
-        dealer.cards.push(drawCard());
-        document.getElementById('dealer-cards').textContent = dealer.cards.join(', ');
-        gameLogDiv.textContent += `Dealer's cards: ${dealer.cards.join(', ')}.\n`;
-    }
-
-    // Restart button functionality
-    restartButton.addEventListener('click', () => {
-        location.reload();
-    });
-
     function startGame() {
         gameLogDiv.textContent += 'Game started. Dealer is shuffling and dealing cards...\n';
-        // Shuffle and deal cards
         shuffleAndDeal();
     }
 
@@ -193,7 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`player-cards-${index}`).textContent = `${card1}, ${card2}`;
         });
         const dealerCard1 = drawCard();
-        dealer.cards.push(dealerCard1);
+        const dealerCard2 = drawCard();
+        dealer.cards.push(dealerCard1, dealerCard2);
         document.getElementById('dealer-cards').textContent = `${dealerCard1}, [hidden]`;
     }
 
@@ -204,4 +207,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const value = values[Math.floor(Math.random() * values.length)];
         return `${value}${suit}`;
     }
-});
+
+    function calculateHandValue(cards) {
+        let value = 0;
+        let aceCount = 0;
+
+        cards.forEach(card => {
+            const cardValue = card.slice(0, -1);
+            if (cardValue === 'A') {
+                value += 11;
+                aceCount++;
+            } else if (['K', 'Q', 'J'].includes(cardValue)) {
+                value += 10;
+            } else {
+                value += parseInt(cardValue, 10);
+            }
+        });
+
+        while (value > 21 && aceCount > 0) {
+            value -= 10;
+            aceCount--;
+        }
+
+        return value;
+    }
+
+    function dealerTurn() {
+        gameLogDiv.textContent += 'Dealer reveals hidden card.\n';
+        document.getElementById('dealer-cards').textContent = dealer.cards.join(', ');
+
+        while (calculateHandValue(dealer.cards) < 17) {
+            dealer.cards.push(drawCard());
+            document.getElementById('dealer-cards').textContent = dealer

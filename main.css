@@ -56,6 +56,10 @@ button:hover {
     margin-top: 10px;
 }
 
-.player-controls button {
-    margin: 5px;
+#restart-game {
+    background-color: #f44336;
+}
+
+#restart-game:hover {
+    background-color: #e53935;
 }
