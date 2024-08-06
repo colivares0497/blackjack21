@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const betAmountInput = document.getElementById('bet-amount');
     const playerBalanceSpan = document.getElementById('player-balance');
     const playerBetSpan = document.getElementById('player-bet');
+    const { player1Hand, player2Hand, dealerHand } = dealCards(deck);
     const hitButton = document.getElementById('hit');
     const stayButton = document.getElementById('stay');
     const restartButton = document.getElementById('restart-game');
