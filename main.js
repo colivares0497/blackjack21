@@ -168,7 +168,18 @@ document.addEventListener('DOMContentLoaded', () => {
         cardContainer.appendChild(cardElement);
     });
 });
-
+// Deal initial cards
+function dealInitialCards() {
+    deck = getNewShuffledDeck();
+    dealer.hand = [deck.pop(), deck.pop()];
+    dealer.total = getHandTotal(dealer.hand);
+    for (let player of players) {
+        player.hand = [deck.pop(), deck.pop()];
+        player.total = getHandTotal(player.hand);
+    }
+    render();
+    checkInitialBlackjack();
+}
 
 
 
