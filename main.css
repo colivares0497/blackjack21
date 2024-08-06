@@ -46,12 +46,12 @@ button:hover {
 }
 
 .player-info {
-    background-color: #fff;
-    color: green;
+    background-color: #393232;
+    color: rgb(203, 210, 203);
 }
 
 .player-bet {
-    background-color: #eee;
+    background-color: #403737;
 }
 
 #game-controls {
@@ -64,7 +64,7 @@ button:hover {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    background-color: #fff;
+    background-color: #5a5252;
     color: green;
 }
 
