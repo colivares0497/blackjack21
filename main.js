@@ -131,7 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return cardElement;
     }
-
+    console.log('Before shuffle:', JSON.stringify(cardData));
+    shuffleArray(cardData);
+    console.log('After shuffle:', JSON.stringify(cardData));
+    
     cardData.forEach(card => {
         const cardElement = createCardElement(card);
         cardContainer.appendChild(cardElement);
