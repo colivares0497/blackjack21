@@ -1,48 +1,70 @@
-/* Basic styles for the entire game */
+/* main.css */
+
+/* Basic reset and body styling */
 body {
+    margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
-    text-align: center;
+    background-color: green; /* Set the background color to green */
+    color: white; /* Set the text color to white for better contrast */
 }
 
+/* Ensure proper visibility for pages and elements */
 #landing-page, #intro-page, #betting-page, #game-page {
-    margin: 20px;
+    background-color: inherit; /* Ensure these pages inherit the green background color from body */
+    padding: 20px;
+    border-radius: 8px;
 }
 
-/* Style for player information */
+/* General layout styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Styling for buttons */
+button {
+    background-color: #fff;
+    color: green;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Styling for game elements */
+.player-info, .player-bet {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
 .player-info {
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #000;
-    border-radius: 5px;
-}
-
-#dealer-info {
-    border: 2px solid #000;
-    margin-bottom: 20px;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f8f8f8;
+    background-color: #fff;
+    color: green;
 }
 
 .player-bet {
-    margin-bottom: 15px;
+    background-color: #eee;
 }
 
-/* Style for game controls */
 #game-controls {
-    margin: 20px;
+    margin-top: 20px;
 }
 
-/* Style for game log */
+/* Styling for game log */
 #game-log {
-    border-top: 1px solid #000;
-    padding-top: 10px;
-    margin-top: 10px;
-    font-size: 1.2em;
-    white-space: pre-wrap;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    color: green;
 }
 
-/* Highlight the current player */
-.player-info.active {
-    border: 2px solid red;
-}
