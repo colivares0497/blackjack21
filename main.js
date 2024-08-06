@@ -9,15 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const bettingTableDiv = document.getElementById('betting-table');
     const submitBetsButton = document.getElementById('submit-bets');
     const gameTableDiv = document.getElementById('game-table');
-    const hitButton = document.getElementById('hit');
-    const stayButton = document.getElementById('stay');
-    const restartButton = document.getElementById('restart-game');
     const gameLogDiv = document.getElementById('game-log');
+    let restartButton;
 
     let players = [];
     let dealer = { name: 'Dealer', balance: 0, cards: [] };
+    let currentPlayerIndex = 0;  // Index of the player whose turn it is
     let gameOver = false;
-    let currentPlayerIndex = 0; // Track the index of the current player whose turn it is
 
     // Start button functionality
     startButton.addEventListener('click', () => {
@@ -121,28 +119,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Balance: $${player.balance}</p>
                 <p>Bet: $${player.bet}</p>
                 <p>Cards: <span id="player-cards-${index}"></span></p>
+                <div id="player-controls-${index}" class="player-controls">
+                    <!-- Buttons will be added dynamically -->
+                </div>
             `;
             gameTableDiv.appendChild(playerDiv);
         });
 
-        // Show game controls
+        // Show game controls (if needed)
         gameTableDiv.innerHTML += `
             <div id="game-controls">
-                <button id="hit">Hit</button>
-                <button id="stay">Stay</button>
+                <button id="restart-game">Restart Game</button>
             </div>
         `;
 
-        // Add event listeners for buttons
-        hitButton.addEventListener('click', handleHit);
-        stayButton.addEventListener('click', handleStay);
+        // Add event listeners for the restart button
+        restartButton = document.getElementById('restart-game');
+        restartButton.addEventListener('click', () => location.reload());
+
+        // Initialize player controls
+        initializePlayerControls();
+    }
+
+    // Initialize player controls
+    function initializePlayerControls() {
+        players.forEach((player, index) => {
+            const controlsDiv = document.getElementById(`player-controls-${index}`);
+            if (controlsDiv) {
+                controlsDiv.innerHTML = `
+                    <button class="hit" data-index="${index}">Hit</button>
+                    <button class="stay" data-index="${index}">Stay</button>
+                `;
+
+                // Add event listeners for player buttons
+                controlsDiv.querySelector('.hit').addEventListener('click', handleHit);
+                controlsDiv.querySelector('.stay').addEventListener('click', handleStay);
+            }
+        });
     }
 
     // Hit button functionality
-    function handleHit() {
-        if (gameOver || currentPlayerIndex >= players.length) return;
+    function handleHit(event) {
+        if (gameOver) return;
 
-        const player = players[currentPlayerIndex];
+        const index = parseInt(event.target.getAttribute('data-index'));
+        const player = players[index];
 
         if (player.hasStood) {
             alert(`${player.name} has already stayed.`);
@@ -151,21 +172,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const card = drawCard();
         player.cards.push(card);
-        document.getElementById(`player-cards-${currentPlayerIndex}`).textContent = player.cards.join(', ');
+        document.getElementById(`player-cards-${index}`).textContent = player.cards.join(', ');
 
         if (calculateHandValue(player.cards) > 21) {
             alert(`${player.name} has busted!`);
             player.hasStood = true; // Player cannot hit after busting
+            checkAllPlayersStayed();
         }
-
-        checkAllPlayersStayed();
     }
 
     // Stay button functionality
-    function handleStay() {
-        if (currentPlayerIndex >= players.length) return;
+    function handleStay(event) {
+        const index = parseInt(event.target.getAttribute('data-index'));
+        const player = players[index];
 
-        const player = players[currentPlayerIndex];
         if (player.hasStood) {
             alert(`${player.name} has already stayed.`);
             return;
@@ -179,17 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAllPlayersStayed() {
         if (players.every(player => player.hasStood)) {
             dealerTurn();
-        } else {
-            // Move to the next player
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-            updateCurrentPlayerDisplay();
         }
-    }
-
-    function updateCurrentPlayerDisplay() {
-        document.querySelectorAll('.player-info').forEach((div, index) => {
-            div.style.border = (index === currentPlayerIndex) ? '2px solid red' : 'none';
-        });
     }
 
     function startGame() {
