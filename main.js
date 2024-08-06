@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let players = [];
     let dealer = { name: 'Dealer', balance: 0, cards: [] };
     let gameOver = false;
+    let currentPlayerIndex = 0; // Track the index of the current player whose turn it is
 
     // Start button functionality
     startButton.addEventListener('click', () => {
@@ -139,30 +140,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hit button functionality
     function handleHit() {
-        if (gameOver) return;
+        if (gameOver || currentPlayerIndex >= players.length) return;
 
-        players.forEach((player, index) => {
-            if (!player.hasStood) {
-                const card = drawCard();
-                player.cards.push(card);
-                document.getElementById(`player-cards-${index}`).textContent = player.cards.join(', ');
+        const player = players[currentPlayerIndex];
 
-                if (calculateHandValue(player.cards) > 21) {
-                    alert(`${player.name} has busted!`);
-                    player.hasStood = true; // Player cannot hit after busting
-                    checkAllPlayersStayed();
-                }
-            }
-        });
+        if (player.hasStood) {
+            alert(`${player.name} has already stayed.`);
+            return;
+        }
+
+        const card = drawCard();
+        player.cards.push(card);
+        document.getElementById(`player-cards-${currentPlayerIndex}`).textContent = player.cards.join(', ');
+
+        if (calculateHandValue(player.cards) > 21) {
+            alert(`${player.name} has busted!`);
+            player.hasStood = true; // Player cannot hit after busting
+        }
+
+        checkAllPlayersStayed();
     }
 
     // Stay button functionality
     function handleStay() {
-        players.forEach(player => {
-            if (!player.hasStood) {
-                player.hasStood = true;
-            }
-        });
+        if (currentPlayerIndex >= players.length) return;
+
+        const player = players[currentPlayerIndex];
+        if (player.hasStood) {
+            alert(`${player.name} has already stayed.`);
+            return;
+        }
+
+        player.hasStood = true;
         checkAllPlayersStayed();
     }
 
@@ -170,7 +179,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAllPlayersStayed() {
         if (players.every(player => player.hasStood)) {
             dealerTurn();
+        } else {
+            // Move to the next player
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            updateCurrentPlayerDisplay();
         }
+    }
+
+    function updateCurrentPlayerDisplay() {
+        document.querySelectorAll('.player-info').forEach((div, index) => {
+            div.style.border = (index === currentPlayerIndex) ? '2px solid red' : 'none';
+        });
     }
 
     function startGame() {
