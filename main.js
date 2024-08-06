@@ -188,3 +188,5 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${value}${suit}`;
     }
 });
+
+kj
