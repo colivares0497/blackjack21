@@ -37,7 +37,7 @@ body {
     text-align: center;
     margin: 5px;
 }
-.card.flipped { background-image: url(‘downloads/Aceblackheart.jpeg’); / Background image when card is flipped */ color: #000; }
+
 .card-container {
     display: flex;
     gap: 10px;
