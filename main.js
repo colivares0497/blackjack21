@@ -195,8 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`player-cards-${index}`).textContent = `${card1}, ${card2}`;
         });
         const dealerCard1 = drawCard();
-        const dealerCard2 = drawCard();
-        dealer.cards.push(dealerCard1, dealerCard2);
+        dealer.cards.push(dealerCard1);
         document.getElementById('dealer-cards').textContent = `${dealerCard1}, [hidden]`;
     }
 
@@ -238,4 +237,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         while (calculateHandValue(dealer.cards) < 17) {
             dealer.cards.push(drawCard());
-            document.getElementById('dealer-cards').textContent = dealer
+            document.getElementById('dealer-cards').textContent = dealer.cards.join(', ');
+        }
+
+        const dealerValue = calculateHandValue(dealer.cards);
+        if (dealerValue === 21) {
+            gameOver = true;
+            gameLogDiv.textContent += 'Dealer has 21. Dealer wins!\n';
+            alert('Dealer wins with a blackjack! All bets are lost.');
+        } else {
+            resolveWinners();
+        }
+    }
+
+    function resolveWinners() {
+        const dealerValue = calculateHandValue(dealer.cards);
+        players.forEach(player => {
+            const playerValue = calculateHandValue(player.cards);
+            if (playerValue > 21) {
+                gameLogDiv.textContent += `${player.name} busts with ${playerValue}. Dealer wins.\n`;
+                gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
+            } else if (dealerValue > 21 || playerValue > dealerValue) {
+                gameLogDiv.textContent += `${player.name} wins with ${playerValue}!\n`;
+                gameLogDiv.textContent += `${player.name} wins $${player.bet}.\n`;
+            } else if (playerValue < dealerValue) {
+                gameLogDiv.textContent += `${player.name} loses with ${playerValue}. Dealer wins.\n`;
+                gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
+            } else {
+                gameLogDiv.textContent += `${player.name} ties with the dealer at ${playerValue}.\n`;
+                // No money changes for a tie
+            }
+        });
+
+        // Display restart button
+        gamePage.innerHTML += '<button id="restart-game">Restart Game</button>';
+        restartButton = document.getElementById('restart-game');
+        restartButton.addEventListener('click', () => location.reload());
+    }
+});
