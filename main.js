@@ -101,11 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show game table functionality
     function showGameTable() {
         gameTableDiv.innerHTML = '';
-
-        // Dealer info
         const dealerDiv = document.createElement('div');
-        dealerDiv.className = 'player-info';
         dealerDiv.id = 'dealer-info';
+        dealerDiv.className = 'player-info';
         dealerDiv.innerHTML = `
             <h3>${dealer.name}</h3>
             <p>Balance: $${dealer.balance}</p>
@@ -113,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         gameTableDiv.appendChild(dealerDiv);
 
-        // Player info
         players.forEach((player, index) => {
             const playerDiv = document.createElement('div');
             playerDiv.className = 'player-info';
@@ -123,61 +120,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Balance: $${player.balance}</p>
                 <p>Bet: $${player.bet}</p>
                 <p>Cards: <span id="player-cards-${index}"></span></p>
-                <div class="player-controls">
-                    <button class="hit" data-index="${index}">Hit</button>
-                    <button class="stay" data-index="${index}">Stay</button>
-                </div>
             `;
             gameTableDiv.appendChild(playerDiv);
         });
 
-        // Show controls
-        hitButton.style.display = 'inline-block';
-        stayButton.style.display = 'inline-block';
+        // Show game controls
+        gameTableDiv.innerHTML += `
+            <div id="game-controls">
+                <button id="hit">Hit</button>
+                <button id="stay">Stay</button>
+            </div>
+        `;
 
-        // Add event listeners for new buttons
-        document.querySelectorAll('.hit').forEach(button => {
-            button.addEventListener('click', (e) => handleHit(e));
-        });
-        document.querySelectorAll('.stay').forEach(button => {
-            button.addEventListener('click', (e) => handleStay(e));
-        });
+        // Add event listeners for buttons
+        hitButton.addEventListener('click', handleHit);
+        stayButton.addEventListener('click', handleStay);
     }
 
     // Hit button functionality
-    function handleHit(event) {
+    function handleHit() {
         if (gameOver) return;
 
-        const index = parseInt(event.target.getAttribute('data-index'));
-        const player = players[index];
+        players.forEach((player, index) => {
+            if (!player.hasStood) {
+                const card = drawCard();
+                player.cards.push(card);
+                document.getElementById(`player-cards-${index}`).textContent = player.cards.join(', ');
 
-        if (player.hasStood) {
-            alert(`${player.name} has already stayed.`);
-            return;
-        }
-
-        const card = drawCard();
-        player.cards.push(card);
-        document.getElementById(`player-cards-${index}`).textContent = player.cards.join(', ');
-
-        if (calculateHandValue(player.cards) > 21) {
-            alert(`${player.name} has busted!`);
-            player.hasStood = true;  // Player cannot hit after busting
-            checkAllPlayersStayed();
-        }
+                if (calculateHandValue(player.cards) > 21) {
+                    alert(`${player.name} has busted!`);
+                    player.hasStood = true; // Player cannot hit after busting
+                    checkAllPlayersStayed();
+                }
+            }
+        });
     }
 
     // Stay button functionality
-    function handleStay(event) {
-        const index = parseInt(event.target.getAttribute('data-index'));
-        const player = players[index];
-
-        if (player.hasStood) {
-            alert(`${player.name} has already stayed.`);
-            return;
-        }
-
-        player.hasStood = true;
+    function handleStay() {
+        players.forEach(player => {
+            if (!player.hasStood) {
+                player.hasStood = true;
+            }
+        });
         checkAllPlayersStayed();
     }
 
