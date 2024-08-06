@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cardElement.classList.add('card');
         cardElement.dataset.value = card.value;
         cardElement.dataset.suit = card.suit;
-        cardElement.style.backgroundImage = `url(${card.image})`;
+        cardElement.style.backgroundImage = `url(${downloads/backcardblue})`;
 
         cardElement.addEventListener('click', () => {
             cardElement.classList.toggle('flipped');
