@@ -103,7 +103,7 @@ function placeBet() {
     } else {
         document.getElementById('betting-controls').style.display = 'none';
         document.getElementById('player-controls').style.display = 'block';
-        dealInitialCards();
+        shufflearray();
     }
 }
 function shuffleArray(array) {
