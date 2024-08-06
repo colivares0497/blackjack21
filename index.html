@@ -7,30 +7,35 @@
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    <div id="landingPage">
-        <h1>Welcome to Blackjack 21</h1>
-        <button id="startButton">Start Game</button>
+    <div id="landing-page">
+        <h1>Blackjack 21</h1>
+        <button id="start-button">Start Game</button>
     </div>
 
-    <div id="playersForm" style="display: none;">
-        <h2>Enter Player Names</h2>
-        <form>
-            <div id="playerInputs"></div>
-            <button type="submit">Submit Players</button>
-        </form>
-    </div>
-
-    <div id="gameContainer" style="display: none;">
-        <div id="dealer" class="player">
-            <h3>Dealer</h3>
-            <p>Balance: $<span id="balance-Dealer">0</span></p>
-            <p>Hand: <span id="hand-Dealer"></span></p>
+    <div id="intro-page" style="display: none;">
+        <h2>Enter Player Details</h2>
+        <div id="player-info">
+            <label for="num-players">Number of Players (1-8):</label>
+            <input type="number" id="num-players" min="1" max="8">
+            <div id="player-names"></div>
         </div>
-        <div id="messages"></div>
-        <button id="placeBetBtn" style="display: none;">Place Bet</button>
-        <button id="hitBtn" style="display: none;">Hit</button>
-        <button id="stayBtn" style="display: none;">Stay</button>
-        <button id="restartBtn" style="display: none;">Restart Game</button>
+        <button id="submit-players">Submit</button>
+    </div>
+
+    <div id="game-page" style="display: none;">
+        <h2>Blackjack 21 Game</h2>
+        <div id="player-info-display">
+            <p>Balance: $<span id="player-balance">20000</span></p>
+            <p>Bet: $<span id="player-bet">0</span></p>
+            <input type="number" id="bet-amount" placeholder="Enter bet amount" min="1" max="20000">
+            <button id="place-bet">Place Bet</button>
+        </div>
+        <div id="game-controls">
+            <button id="hit">Hit</button>
+            <button id="stay">Stay</button>
+        </div>
+        <div id="game-log"></div>
+        <button id="restart-game" style="display: none;">Restart Game</button>
     </div>
 
     <script src="main.js"></script>
