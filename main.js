@@ -9,12 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const bettingTableDiv = document.getElementById('betting-table');
     const submitBetsButton = document.getElementById('submit-bets');
     const gameTableDiv = document.getElementById('game-table');
-    const gameLogDiv = document.getElementById('game-log');
+    const hitButton = document.getElementById('hit');
+    const stayButton = document.getElementById('stay');
     const restartButton = document.getElementById('restart-game');
+    const gameLogDiv = document.getElementById('game-log');
 
     let players = [];
     let dealer = { name: 'Dealer', balance: 0, cards: [] };
-    let deck = [];
 
     // Start button functionality
     startButton.addEventListener('click', () => {
@@ -99,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show game table functionality
     function showGameTable() {
         gameTableDiv.innerHTML = '';
-        
         const dealerDiv = document.createElement('div');
         dealerDiv.className = 'player-info';
         dealerDiv.innerHTML = `
@@ -119,47 +119,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Bet: $${player.bet}</p>
                 <p>Cards: <span id="player-cards-${index}"></span></p>
                 <div class="player-controls">
-                    <button id="hit-${index}">Hit</button>
-                    <button id="stay-${index}">Stay</button>
+                    <button class="player-hit" data-player-index="${index}">Hit</button>
+                    <button class="player-stay" data-player-index="${index}">Stay</button>
                 </div>
             `;
             gameTableDiv.appendChild(playerDiv);
-
-            // Add event listeners for these buttons
-            document.getElementById(`hit-${index}`).addEventListener('click', () => handleHit(index));
-            document.getElementById(`stay-${index}`).addEventListener('click', () => handleStay(index));
         });
     }
 
-    // Handle Hit Button Click
-    function handleHit(playerIndex) {
+    // Add event listeners to player-specific hit and stay buttons
+    gameTableDiv.addEventListener('click', (event) => {
+        if (event.target.classList.contains('player-hit')) {
+            const playerIndex = event.target.dataset.playerIndex;
+            handlePlayerHit(parseInt(playerIndex));
+        } else if (event.target.classList.contains('player-stay')) {
+            const playerIndex = event.target.dataset.playerIndex;
+            handlePlayerStay(parseInt(playerIndex));
+        }
+    });
+
+    // Handle player's "Hit" action
+    function handlePlayerHit(playerIndex) {
         const player = players[playerIndex];
         const newCard = drawCard();
         player.cards.push(newCard);
-
-        // Update player’s card display
-        document.getElementById(`player-cards-${playerIndex}`).textContent += `, ${newCard}`;
-
-        // Check for bust
-        if (calculateHandValue(player.cards) > 21) {
-            gameLogDiv.textContent += `${player.name} busts with ${player.cards.join(', ')}.\n`;
-            // Disable hit and stay buttons for this player
-            document.getElementById(`hit-${playerIndex}`).disabled = true;
-            document.getElementById(`stay-${playerIndex}`).disabled = true;
-        }
+        document.getElementById(`player-cards-${playerIndex}`).textContent = player.cards.join(', ');
+        gameLogDiv.textContent += `${player.name} drew a ${newCard}.\n`;
     }
 
-    // Handle Stay Button Click
-    function handleStay(playerIndex) {
-        gameLogDiv.textContent += `${players[playerIndex].name} stays.\n`;
-        // Disable hit and stay buttons for this player
-        document.getElementById(`hit-${playerIndex}`).disabled = true;
-        document.getElementById(`stay-${playerIndex}`).disabled = true;
-
-        // Check if all players have stayed
-        if (players.every(player => document.getElementById(`stay-${playerIndex}`).disabled)) {
-            dealerPlay();
-        }
+    // Handle player's "Stay" action
+    function handlePlayerStay(playerIndex) {
+        const player = players[playerIndex];
+        gameLogDiv.textContent += `${player.name} chose to stay.\n`;
     }
 
     // Restart button functionality
@@ -167,19 +158,16 @@ document.addEventListener('DOMContentLoaded', () => {
         location.reload();
     });
 
-    // Start Game Function
     function startGame() {
         gameLogDiv.textContent += 'Game started. Dealer is shuffling and dealing cards...\n';
-        // Create and shuffle deck
-        createDeck();
-        shuffleDeck();
         // Shuffle and deal cards
         shuffleAndDeal();
     }
 
-    // Shuffle and deal cards
     function shuffleAndDeal() {
-        // Shuffle and deal logic here
+        // Implement shuffling and dealing logic here
+        gameLogDiv.textContent += 'Dealer shuffles the deck.\n';
+        gameLogDiv.textContent += 'Dealer deals cards to each player.\n';
         players.forEach((player, index) => {
             const card1 = drawCard();
             const card2 = drawCard();
@@ -191,20 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dealer-cards').textContent = `${dealerCard1}, [hidden]`;
     }
 
-    // Create deck function
-    function createDeck() {
-        deck = [];
+    function drawCard() {
+        // Implement card drawing logic here
         const suits = ['♣', '♦', '♥', '♠'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        suits.forEach(suit => {
-            values.forEach(value => {
-                deck.push({ value, suit });
-            });
-        });
+        const suit = suits[Math.floor(Math.random() * suits.length)];
+        const value = values[Math.floor(Math.random() * values.length)];
+        return `${value}${suit}`;
     }
-
-    // Shuffle deck function
-    function shuffleDeck() {
-        for (let i = deck.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [deck[i
+});
