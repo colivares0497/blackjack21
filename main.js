@@ -104,7 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
         dealerDiv.innerHTML = `
             <h3>${dealer.name}</h3>
             <p>Balance: $${dealer.balance}</p>
-            <p>Cards: <span id="dealer-cards"></span></p>
+            <div id="dealer-cards" class="card-flip">
+                <!-- The card-flip-inner will be updated dynamically -->
+            </div>
         `;
         gameTableDiv.appendChild(dealerDiv);
 
@@ -170,10 +172,32 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`player-cards-${index}`).innerHTML = cardImages;
     }
 
-    // Update dealer card display with images
-    function updateDealerCardDisplay() {
-        const cardImages = dealer.cards.map(card => `<img src="${card.image}" alt="${card.value} of ${card.suit}" class="card-image">`).join(' ');
-        document.getElementById('dealer-cards').innerHTML = cardImages;
+    // Update dealer card display with card-flipping effect
+    function updateDealerCardDisplay(isFlipping = false) {
+        const dealerCardsDiv = document.getElementById('dealer-cards');
+        dealerCardsDiv.innerHTML = ''; // Clear previous content
+
+        if (isFlipping) {
+            const frontCard = dealer.cards[0];
+            const backCard = dealer.cards[1] || { image: '', value: 'Hidden Card', suit: '' };
+
+            dealerCardsDiv.innerHTML = `
+                <div class="card-flip">
+                    <div class="card-flip-inner">
+                        <div class="card-flip-front">
+                            <img src="${frontCard.image}" alt="${frontCard.value} of ${frontCard.suit}" class="card-image">
+                        </div>
+                        <div class="card-flip-back">
+                            <p>${backCard.value} - ${backCard.suit}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            dealer.cards.forEach(card => {
+                dealerCardsDiv.innerHTML += `<img src="${card.image}" alt="${card.value} of ${card.suit}" class="card-image">`;
+            });
+        }
     }
 
     // Start the game
@@ -199,172 +223,131 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         drawCard().then(card1 => {
             dealer.cards.push(card1);
-            document.getElementById('dealer-cards').innerHTML = `<img src="${card1.image}" alt="${card1.value} of ${card1.suit}" class="card-image">, [hidden]`;
+            document.getElementById('dealer-cards').innerHTML = `<div class="card-flip"><div class="card-flip-inner"><div class="card-flip-front"><img src="${card1.image}" alt="${card1.value} of ${card1.suit}" class="card-image"></div><div class="card-flip-back"><p>Hidden Card</p></div></div></div>`;
         });
+    }
+
+    // Handle player's hit action
+    function handleHit(event) {
+        if (gameOver) return;
+        const playerIndex = parseInt(event.target.dataset.index);
+        const player = players[playerIndex];
+        if (player.hasStood) {
+            alert('You have already stood.');
+            return;
+        }
+        drawCard().then(card => {
+            player.cards.push(card);
+            updatePlayerCardDisplay(playerIndex);
+            const handValue = calculateHandValue(player.cards);
+            document.getElementById(`player-status-${playerIndex}`).textContent = `Hand value: ${handValue}`;
+
+            if (handValue > 21) {
+                document.getElementById(`player-result-${playerIndex}`).textContent = 'Busted!';
+                player.hasStood = true;
+                checkAllPlayersFinished();
+            }
+        });
+    }
+
+    // Handle player's stay action
+    function handleStay(event) {
+        if (gameOver) return;
+        const playerIndex = parseInt(event.target.dataset.index);
+        const player = players[playerIndex];
+        player.hasStood = true;
+        document.getElementById(`player-status-${playerIndex}`).textContent = 'Stayed';
+        checkAllPlayersFinished();
+    }
+
+    // Check if all players have finished their turn
+    function checkAllPlayersFinished() {
+        if (players.every(player => player.hasStood || calculateHandValue(player.cards) > 21)) {
+            dealerTurn();
+        }
     }
 
     // Calculate hand value
     function calculateHandValue(cards) {
         let value = 0;
-        let aceCount = 0;
-
+        let hasAce = false;
         cards.forEach(card => {
-            const cardValue = card.value;
-            if (cardValue === 'ACE') {
-                value += 11;
-                aceCount++;
-            } else if (['KING', 'QUEEN', 'JACK'].includes(cardValue)) {
+            if (['JACK', 'QUEEN', 'KING'].includes(card.value)) {
                 value += 10;
+            } else if (card.value === 'ACE') {
+                value += 11;
+                hasAce = true;
             } else {
-                value += parseInt(cardValue, 10);
+                value += parseInt(card.value);
             }
         });
-
-        while (value > 21 && aceCount > 0) {
+        while (value > 21 && hasAce) {
             value -= 10;
-            aceCount--;
+            hasAce = false;
         }
-
         return value;
     }
 
-    // Hit button functionality
-    function handleHit(event) {
-        if (gameOver) return;
-
-        const index = parseInt(event.target.getAttribute('data-index'));
-        const player = players[index];
-
-        if (player.hasStood) {
-            alert(`${player.name} has already stayed.`);
-            return;
-        }
-
-        drawCard().then(card => {
-            player.cards.push(card);
-            updatePlayerCardDisplay(index);
-
-            if (calculateHandValue(player.cards) > 21) {
-                alert(`${player.name} has busted!`);
-                dealer.balance += player.bet;  // Player's bet goes to dealer
-                player.balance -= player.bet;  // Player loses their bet
-                player.bet = 0;  // Reset player's bet
-                player.hasStood = true;  // Player cannot hit after busting
-
-                // Display result for player
-                document.getElementById(`player-result-${index}`).textContent = `${player.name} busts!`;
-                document.getElementById(`player-status-${index}`).textContent = 'Busted!';
-
-                // Disable player controls
-                document.querySelector(`.hit[data-index="${index}"]`).disabled = true;
-                document.querySelector(`.stay[data-index="${index}"]`).disabled = true;
-
-                // Re-enable buttons for remaining players
-                updatePlayerControls();
-
-                checkAllPlayersStayed();
-            }
-        });
-    }
-
-    // Stay button functionality
-    function handleStay(event) {
-        const index = parseInt(event.target.getAttribute('data-index'));
-        const player = players[index];
-
-        if (player.hasStood) {
-            alert(`${player.name} has already stayed.`);
-            return;
-        }
-
-        player.hasStood = true;
-        document.querySelector(`.hit[data-index="${index}"]`).disabled = true;  // Disable Hit button
-        document.querySelector(`.stay[data-index="${index}"]`).disabled = true;  // Disable Stay button
-
-        // Display the status of staying on the page
-        document.getElementById(`player-status-${index}`).textContent = `${player.name} has stayed.`;
-
-        checkAllPlayersStayed();
-    }
-
-    // Update player controls after removal
-    function updatePlayerControls() {
-        document.querySelectorAll('.hit').forEach(button => {
-            button.addEventListener('click', handleHit);
-        });
-        document.querySelectorAll('.stay').forEach(button => {
-            button.addEventListener('click', handleStay);
-        });
-    }
-
-    // Check if all players have stayed or busted
-    function checkAllPlayersStayed() {
-        if (players.length === 0 || players.every(player => player.hasStood)) {
-            dealerTurn();
-        }
-    }
-
+    // Dealer's turn logic including card flipping effect
     function dealerTurn() {
         gameLogDiv.textContent += 'Dealer reveals hidden card.\n';
+
+        // Initial card display with hidden card
         updateDealerCardDisplay();
 
-        while (calculateHandValue(dealer.cards) < 17) {
-            drawCard().then(card => {
-                dealer.cards.push(card);
-                updateDealerCardDisplay();
-            });
-        }
+        // Animate card flipping
+        setTimeout(() => {
+            updateDealerCardDisplay(true);
+        }, 1000); // Adjust the delay as needed
 
-        const dealerValue = calculateHandValue(dealer.cards);
-        if (dealerValue === 21) {
-            gameOver = true;
-            gameLogDiv.textContent += 'Dealer has 21. Dealer wins!\n';
-            alert('Dealer wins with a blackjack! All bets are lost.');
-            endGame();
-        } else {
-            resolveWinners();
-        }
+        // Continue with the dealer's turn
+        setTimeout(() => {
+            let dealerValue = calculateHandValue(dealer.cards);
+            while (dealerValue < 17) {
+                drawCard().then(card => {
+                    dealer.cards.push(card);
+                    updateDealerCardDisplay();
+                    dealerValue = calculateHandValue(dealer.cards);
+                });
+            }
+
+            if (dealerValue === 21) {
+                gameOver = true;
+                gameLogDiv.textContent += 'Dealer has 21. Dealer wins!\n';
+                alert('Dealer wins with a blackjack! All bets are lost.');
+                endGame();
+            } else {
+                resolveWinners();
+            }
+        }, 2000); // Adjust the delay to ensure flipping effect is visible
     }
 
+    // Resolve winners
     function resolveWinners() {
         const dealerValue = calculateHandValue(dealer.cards);
         players.forEach(player => {
             const playerValue = calculateHandValue(player.cards);
-            const resultParagraph = document.getElementById(`player-result-${players.indexOf(player)}`);
             if (playerValue > 21) {
-                gameLogDiv.textContent += `${player.name} busts with ${playerValue}. Dealer wins.\n`;
-                gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
-                dealer.balance += player.bet;  // Player's bet goes to dealer
-                player.balance -= player.bet;  // Player loses their bet
-                player.bet = 0;  // Reset player's bet
-                resultParagraph.textContent = `${player.name} busts! Dealer wins.`;
+                gameLogDiv.textContent += `${player.name} busts with ${playerValue}!\n`;
             } else if (dealerValue > 21 || playerValue > dealerValue) {
-                player.balance += player.bet * 2; // Player wins, gets back their bet plus winnings
                 gameLogDiv.textContent += `${player.name} wins with ${playerValue}!\n`;
-                gameLogDiv.textContent += `${player.name} wins $${player.bet}.\n`;
-                player.bet = 0;  // Reset player's bet
-                resultParagraph.textContent = `${player.name} wins with ${playerValue}!`;
-            } else if (playerValue < dealerValue) {
-                gameLogDiv.textContent += `${player.name} loses with ${playerValue}. Dealer wins.\n`;
-                gameLogDiv.textContent += `${player.name} loses $${player.bet}.\n`;
-                dealer.balance += player.bet;  // Player's bet goes to dealer
-                player.balance -= player.bet;  // Player loses their bet
-                player.bet = 0;  // Reset player's bet
-                resultParagraph.textContent = `${player.name} loses with ${playerValue}. Dealer wins.`;
+                player.balance += player.bet * 2; // Win bet amount
+            } else if (playerValue === dealerValue) {
+                gameLogDiv.textContent += `${player.name} ties with ${playerValue}!\n`;
+                player.balance += player.bet; // Return bet amount
             } else {
-                player.balance += player.bet; // Tie, player gets back their bet
-                gameLogDiv.textContent += `${player.name} ties with the dealer at ${playerValue}.\n`;
-                player.bet = 0;  // Reset player's bet
-                resultParagraph.textContent = `${player.name} ties with the dealer at ${playerValue}.`;
+                gameLogDiv.textContent += `${player.name} loses with ${playerValue}.\n`;
             }
         });
-
         endGame();
     }
 
+    // End game
     function endGame() {
-        gamePage.innerHTML += '<button id="restart-game">Restart Game</button>';
-        const restartButton = document.getElementById('restart-game');
-        restartButton.addEventListener('click', () => location.reload());
+        gameOver = true;
+        document.getElementById('game-controls').innerHTML = '<button id="restart-game">Restart Game</button>';
+        document.getElementById('restart-game').addEventListener('click', () => {
+            location.reload();
+        });
     }
 });
