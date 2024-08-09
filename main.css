@@ -1,27 +1,81 @@
-/* Basic reset and body styling */
+/* Overall page styles */
 body {
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: rgb(31, 141, 31); /* Set the background color to green */
-    color: white; /* Set the text color to white for better contrast */
+    background-color: rgb(31, 141, 31); /* Background color for the entire page */
+    color: white; /* Default text color for readability */
 }
 
-/* Ensure proper visibility for pages and elements */
+/* Page containers styling */
 #landing-page, #intro-page, #betting-page, #game-page {
-    background-color: inherit; /* Ensure these pages inherit the green background color from body */
+    background-color: inherit; /* Inherit background color from body */
     padding: 20px;
     border-radius: 8px;
-    margin: 10px; /* Add some margin for better spacing */
+    margin: 10px;
 }
 
-/* General layout styles */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+/* Card container to ensure proper display */
+.card-container {
+    width: 71px; /* Width of a standard card image */
+    height: 96px; /* Height of a standard card image */
+    display: inline-block;
+    margin: 5px;
+    position: relative;
 }
 
-/* Styling for buttons */
+/* Card styling to ensure full image is shown */
+.card {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #ddd; /* Optional border to define card edges */
+    border-radius: 4px; /* Optional rounding of corners */
+}
+
+/* Placeholder for hidden cards */
+.card-container .card {
+    background-image: url('https://via.placeholder.com/71x96'); /* Placeholder image */
+}
+
+/* Player and dealer information styling */
+.player-info, #dealer-info {
+    margin-bottom: 20px;
+}
+
+.player-hand {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Space between cards */
+}
+
+/* Styling for player status, including stay/busted */
+.player-status {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Specific colors for status messages */
+.stayed {
+    color: #00ff00; /* Green color for stayed */
+}
+
+.busted {
+    color: #ff0000; /* Red color for busted */
+}
+
+/* Betting table and player betting information */
+#betting-table {
+    margin-top: 20px;
+}
+
+.player-bet {
+    margin-bottom: 10px;
+}
+
+/* Button styling */
 button {
     background-color: #fff;
     color: green;
@@ -36,28 +90,7 @@ button:hover {
     background-color: #f0f0f0;
 }
 
-/* Styling for game elements */
-.player-info, .player-bet {
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.player-info {
-    background-color: #393232;
-    color: rgb(203, 210, 203);
-}
-
-.player-bet {
-    background-color: #403737;
-}
-
-#game-controls {
-    margin-top: 20px;
-}
-
-/* Styling for game log */
+/* Game log styling */
 #game-log {
     margin-top: 20px;
     padding: 10px;
@@ -65,75 +98,4 @@ button:hover {
     border-radius: 5px;
     background-color: #5a5252;
     color: green;
-}
-
-/* Card container styling */
-.card-container {
-    position: relative;
-    width: 120px; /* Adjust as needed */
-    height: 170px; /* Adjust as needed */
-    margin: 5px;
-    perspective: 1000px; /* Needed for 3D effect */
-    display: inline-block;
-}
-
-.card {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    backface-visibility: hidden;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-}
-
-.card-front {
-    background-size: cover;
-    background-position: center;
-}
-
-.card-back {
-    background-color: #333;
-    transform: rotateY(180deg);
-}
-
-/* Flip effect */
-.card-container.flip .card {
-    transform: rotateY(180deg);
-}
-
-/* Always show card front */
-.card-container .card-front {
-    visibility: visible;
-}
-
-/* Show card back only when flipped */
-.card-container .card-back {
-    visibility: hidden;
-}
-
-.card-container.flip .card-back {
-    visibility: visible;
-}
-
-/* Styling for player hands */
-.player-hand {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Space between cards */
-    margin: 10px 0;
-}
-
-.player-hand .card-container {
-    width: 120px; /* Adjust card size if needed */
-    height: 170px; /* Adjust card size if needed */
-}
-
-/* Dealer card styling */
-#dealer-info {
-    margin-bottom: 20px;
-}
-
-#dealer-cards {
-    display: flex;
-    gap: 10px;
 }
